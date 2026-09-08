@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mixing Matter Lab: Sand + Salt + Water</title>
+<style>
+  :root{
+    --ink:#16324f;
+    --teal:#2a9d8f;
+    --pink:#ff5ca8;
+    --lime:#b7ef5a;
+    --purple:#8f6df6;
+    --sky:#dff6ff;
+    --paper:#fffdf9;
+    --line:#d9e6ef;
+    --good:#1f8f5f;
+    --bad:#c94a4a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,92,168,.16), transparent 22%),
+      radial-gradient(circle at 80% 15%, rgba(42,157,143,.16), transparent 24%),
+      linear-gradient(180deg,#f5fbff,#fff7fc);
+    color:var(--ink);
+  }
+  .wrap{max-width:1050px;margin:auto;padding:24px}
+  .hero{
+    background:var(--paper);
+    border:4px solid var(--ink);
+    border-radius:28px;
+    padding:24px;
+    box-shadow:10px 10px 0 rgba(22,50,79,.12);
+    position:relative;
+    overflow:hidden;
+  }
+  h1{margin:0 0 6px;font-size:clamp(30px,4vw,52px);line-height:1}
+  .sub{font-size:18px;margin:0}
+  .badge{
+    display:inline-block;
+    margin-top:14px;
+    padding:8px 14px;
+    background:var(--lime);
+    border:3px solid var(--ink);
+    border-radius:999px;
+    font-weight:800;
+  }
+  .section{
+    margin-top:24px;
+    background:white;
+    border:3px solid var(--ink);
+    border-radius:24px;
+    padding:22px;
+    box-shadow:7px 7px 0 rgba(22,50,79,.09);
+  }
+  .section h2{margin:0 0 14px;font-size:28px}
+  .step{
+    display:inline-flex;width:38px;height:38px;border-radius:50%;
+    align-items:center;justify-content:center;
+    background:var(--pink);color:white;border:3px solid var(--ink);
+    margin-right:8px;font-weight:900;
+  }
+  textarea,input,select{
+    width:100%;
+    border:2px solid #9db5c6;
+    border-radius:12px;
+    padding:10px;
+    font:inherit;
+    background:#fff;
+  }
+  textarea{min-height:80px;resize:vertical}
+  .choices{display:flex;gap:12px;flex-wrap:wrap}
+  .choice{
+    border:2px solid var(--ink);
+    padding:10px 14px;border-radius:14px;background:#fff;
+    cursor:pointer;font-weight:800;
+  }
+  .choice input{width:auto;margin-right:6px}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{border:2px solid var(--ink);padding:9px;vertical-align:middle}
+  th{background:var(--sky)}
+  .materials{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:14px;
+  }
+  .mat{
+    border:3px solid var(--ink);
+    border-radius:20px;
+    padding:16px;
+    text-align:center;
+    background:#fff;
+  }
+  .icon{font-size:54px}
+  .mass{
+    display:inline-block;
+    margin-top:8px;
+    background:#f1f7fa;
+    padding:6px 10px;border-radius:999px;
+    font-weight:900;
+  }
+  .scale{
+    margin:18px auto 0;
+    max-width:520px;
+    background:#eaf4f8;
+    border:4px solid var(--ink);
+    border-radius:22px;
+    padding:18px;
+    text-align:center;
+  }
+  .display{
+    font-family:Consolas,monospace;
+    background:#1c2733;color:#b7ef5a;
+    display:inline-block;
+    padding:12px 20px;border-radius:10px;
+    font-size:30px;font-weight:900;
+  }
+  .lab{
+    display:grid;
+    grid-template-columns:1fr 1.4fr;
+    gap:18px;
+    align-items:center;
+  }
+  .beaker{
+    height:310px;
+    border:8px solid var(--ink);
+    border-top:none;
+    border-radius:0 0 42px 42px;
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(to top,#dff6ff 0 62%,transparent 62%);
+    margin:0 auto;
+    max-width:330px;
+  }
+  .water{
+    position:absolute;left:0;right:0;bottom:0;height:62%;
+    background:rgba(92,198,239,.45);
+  }
+  .sand{
+    position:absolute;left:0;right:0;bottom:0;height:0%;
+    background:linear-gradient(#d6b16c,#b88f4e);
+    transition:.6s;
+  }
+  .saltDots{
+    position:absolute;inset:0;
+    opacity:0;transition:.6s;
+    background-image:
+      radial-gradient(circle,#ffffff 0 2px,transparent 3px);
+    background-size:26px 24px;
+  }
+  .cloud{
+    position:absolute;inset:30% 0 0;
+    background:rgba(255,255,255,.2);
+    opacity:0;transition:.5s;
+  }
+  .beaker.mixed .sand{height:20%}
+  .beaker.mixed .saltDots{opacity:.18}
+  .beaker.mixed .cloud{opacity:1}
+  .beaker.mixed .stir{animation:spin .7s linear 3}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .stir{
+    position:absolute;right:42%;top:10px;font-size:60px;z-index:4;
+    transform-origin:50% 180px;
+  }
+  .btn{
+    display:inline-block;
+    border:3px solid var(--ink);
+    border-radius:14px;
+    padding:11px 16px;
+    font-weight:900;
+    cursor:pointer;
+    background:var(--lime);
+    box-shadow:4px 4px 0 var(--ink);
+    margin:6px 6px 0 0;
+  }
+  .btn.secondary{background:#fff}
+  .btn.pink{background:var(--pink);color:white}
+  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .status{
+    padding:12px;border-radius:14px;margin-top:12px;font-weight:800;
+    background:#f4f8fb;border:2px dashed #9db5c6;
+  }
+  .correct{background:#eaf8f1;border-color:var(--good);color:#126141}
+  .incorrect{background:#fff0f0;border-color:var(--bad);color:#8f2d2d}
+  .score{
+    font-size:26px;font-weight:900;padding:14px;border-radius:16px;
+    background:#fff6cc;border:3px solid var(--ink);margin-top:14px;
+  }
+  .small{font-size:14px;color:#49647a}
+  .footer{text-align:center;padding:26px;font-size:13px;color:#526b7c}
+  @media(max-width:760px){
+    .materials{grid-template-columns:1fr}
+    .lab{grid-template-columns:1fr}
+    table{font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🧪 Mixing Matter Lab</h1>
+    <p class="sub">Sand + Salt + Water • Grade 5 Science</p>
+    <span class="badge">Goal: Observe what changes — and what stays the same!</span>
+  </div>
+
+  <section class="section">
+    <h2><span class="step">1</span>Make a Prediction</h2>
+    <label><b>What do you think will happen when the substances are mixed?</b></label>
+    <textarea id="predText" placeholder="I predict that..."></textarea>
+    <p><b>What will happen to the total mass after mixing?</b></p>
+    <div class="choices">
+      <label class="choice"><input type="radio" name="predMass" value="increase">Increase</label>
+      <label class="choice"><input type="radio" name="predMass" value="decrease">Decrease</label>
+      <label class="choice"><input type="radio" name="predMass" value="same">Stay the same</label>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">2</span>Observe the Separate Substances</h2>
+    <div class="materials">
+      <div class="mat"><div class="icon">🏖️</div><h3>Sand</h3><div class="mass">20 g</div></div>
+      <div class="mat"><div class="icon">💧</div><h3>Water</h3><div class="mass">50 g</div></div>
+      <div class="mat"><div class="icon">🧂</div><h3>Salt</h3><div class="mass">10 g</div></div>
+    </div>
+
+    <table>
+      <tr><th>Substance</th><th>Physical State</th><th>Color</th><th>Shape</th><th>Mass</th></tr>
+      <tr>
+        <td><b>Sand</b></td>
+        <td><select id="sandState"><option value="">Choose</option><option>Solid</option><option>Liquid</option></select></td>
+        <td><select id="sandColor"><option value="">Choose</option><option>Tan/Brown</option><option>Clear</option><option>White</option></select></td>
+        <td><select id="sandShape"><option value="">Choose</option><option>Has its own shape</option><option>Takes shape of container</option></select></td>
+        <td>20 g</td>
+      </tr>
+      <tr>
+        <td><b>Water</b></td>
+        <td><select id="waterState"><option value="">Choose</option><option>Solid</option><option>Liquid</option></select></td>
+        <td><select id="waterColor"><option value="">Choose</option><option>Tan/Brown</option><option>Clear</option><option>White</option></select></td>
+        <td><select id="waterShape"><option value="">Choose</option><option>Has its own shape</option><option>Takes shape of container</option></select></td>
+        <td>50 g</td>
+      </tr>
+      <tr>
+        <td><b>Salt</b></td>
+        <td><select id="saltState"><option value="">Choose</option><option>Solid</option><option>Liquid</option></select></td>
+        <td><select id="saltColor"><option value="">Choose</option><option>Tan/Brown</option><option>Clear</option><option>White</option></select></td>
+        <td><select id="saltShape"><option value="">Choose</option><option>Has its own shape</option><option>Takes shape of container</option></select></td>
+        <td>10 g</td>
+      </tr>
+    </table>
+
+    <div class="scale">
+      <p><b>Total Mass Before Mixing</b></p>
+      <div class="display">80 g</div>
+      <p class="small">20 g + 50 g + 10 g = 80 g</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">3</span>Mix the Substances</h2>
+    <div class="lab">
+      <div>
+        <p><b>Click the button to mix the sand, salt, and water.</b></p>
+        <button class="btn pink" onclick="mixIt()">MIX! 🥄</button>
+        <button class="btn secondary" onclick="resetMix()">Reset Mixture</button>
+        <div id="mixStatus" class="status">The substances have not been mixed yet.</div>
+      </div>
+      <div class="beaker" id="beaker">
+        <div class="water"></div>
+        <div class="sand"></div>
+        <div class="saltDots"></div>
+        <div class="cloud"></div>
+        <div class="stir">🥄</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">4</span>Observe the Mixture</h2>
+    <table>
+      <tr><th>Property</th><th>Your Observation</th></tr>
+      <tr><td>Physical State</td><td><select id="mixState"><option value="">Choose</option><option>Mostly liquid with solid sand</option><option>Only solid</option><option>Only gas</option></select></td></tr>
+      <tr><td>Color</td><td><select id="mixColor"><option value="">Choose</option><option>Clear/cloudy with tan sand</option><option>Bright red</option><option>Black</option></select></td></tr>
+      <tr><td>Shape</td><td><select id="mixShape"><option value="">Choose</option><option>Takes the shape of the container</option><option>Keeps one fixed shape</option></select></td></tr>
+      <tr><td>Appearance of Sand</td><td><select id="sandAppear"><option value="">Choose</option><option>Still visible and settles</option><option>Disappears completely</option></select></td></tr>
+      <tr><td>Appearance of Salt</td><td><select id="saltAppear"><option value="">Choose</option><option>Dissolves and is hard to see</option><option>Turns into gas</option></select></td></tr>
+      <tr><td>Appearance of Water</td><td><select id="waterAppear"><option value="">Choose</option><option>Still present as liquid</option><option>Becomes a solid</option></select></td></tr>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">5</span>Measure the Mixture</h2>
+    <div class="scale">
+      <p><b>Mass of Mixture</b></p>
+      <div class="display">80 g</div>
+      <p class="small">No matter was added or removed.</p>
+    </div>
+    <p><b>Compare the masses:</b></p>
+    <div class="choices">
+      <label class="choice"><input type="radio" name="compareMass" value="same">The mass stayed the same.</label>
+      <label class="choice"><input type="radio" name="compareMass" value="increase">The mass increased.</label>
+      <label class="choice"><input type="radio" name="compareMass" value="decrease">The mass decreased.</label>
+    </div>
+    <p><b>Difference:</b></p>
+    <select id="difference">
+      <option value="">Choose</option>
+      <option value="0">0 g</option>
+      <option value="10">10 g</option>
+      <option value="20">20 g</option>
+    </select>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">6</span>Conclusion</h2>
+    <label><b>How did mixing affect the properties of the substances?</b></label>
+    <textarea id="conclusion1" placeholder="Mixing changed..."></textarea>
+    <br><br>
+    <label><b>How did mixing affect the total mass?</b></label>
+    <textarea id="conclusion2" placeholder="The total mass..."></textarea>
+    <br><br>
+    <label><b>Sentence Stem: Mixing affects substances by...</b></label>
+    <textarea id="stem" placeholder="Mixing affects substances by..."></textarea>
+  </section>
+
+  <section class="section">
+    <h2><span class="step">7</span>Check My Work</h2>
+    <p>When you are finished, click <b>Check My Answers</b>.</p>
+    <button class="btn" onclick="gradeLab()">Check My Answers ✅</button>
+    <button class="btn secondary" onclick="tryAgain()">Try Again ↻</button>
+    <div id="scoreBox"></div>
+  </section>
+
+  <div class="footer">
+    Classroom simulation for practicing observations about mixtures and conservation of mass.
+  </div>
+</div>
+
+<script>
+function mixIt(){
+  document.getElementById('beaker').classList.add('mixed');
+  document.getElementById('mixStatus').innerHTML =
+    "✅ Mixed! The <b>salt dissolves</b>, the <b>sand remains visible and settles</b>, and the <b>water remains liquid</b>.";
+  document.getElementById('mixStatus').className='status correct';
+}
+function resetMix(){
+  document.getElementById('beaker').classList.remove('mixed');
+  document.getElementById('mixStatus').textContent='The substances have not been mixed yet.';
+  document.getElementById('mixStatus').className='status';
+}
+function val(id){return document.getElementById(id).value}
+function checked(name){
+  const el=document.querySelector('input[name="'+name+'"]:checked');
+  return el ? el.value : '';
+}
+function gradeLab(){
+  let score=0, total=15;
+
+  const checks = [
+    [val('sandState'),'Solid'],
+    [val('sandColor'),'Tan/Brown'],
+    [val('sandShape'),'Has its own shape'],
+    [val('waterState'),'Liquid'],
+    [val('waterColor'),'Clear'],
+    [val('waterShape'),'Takes shape of container'],
+    [val('saltState'),'Solid'],
+    [val('saltColor'),'White'],
+    [val('saltShape'),'Has its own shape'],
+    [val('mixState'),'Mostly liquid with solid sand'],
+    [val('mixColor'),'Clear/cloudy with tan sand'],
+    [val('mixShape'),'Takes the shape of the container'],
+    [val('sandAppear'),'Still visible and settles'],
+    [val('saltAppear'),'Dissolves and is hard to see'],
+    [checked('compareMass'),'same']
+  ];
+  checks.forEach(c=>{if(c[0]===c[1]) score++;});
+  if(val('difference')==='0') {score++; total++;}
+  if(val('waterAppear')==='Still present as liquid') {score++; total++;}
+
+  const pct=Math.round(score/total*100);
+  let msg = pct>=80
+    ? "🌟 Great job! You showed that mixing can change how substances look, but the total mass stays the same."
+    : "💡 Keep going! Recheck the physical states, what dissolved, and what happened to the total mass.";
+
+  document.getElementById('scoreBox').innerHTML =
+    '<div class="score">'+score+' / '+total+' correct ('+pct+'%)</div><div class="status">'+msg+'</div>';
+}
+function tryAgain(){
+  document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
+  document.querySelectorAll('textarea').forEach(t=>t.value='');
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  document.getElementById('scoreBox').innerHTML='';
+  resetMix();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
